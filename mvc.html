@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	内容：<p id="content">MVC</p>
+</body>
+</html>
+
+<script type="text/javascript">
+	var Myapp = {};
+
+	var Model = function(){
+		this.data = {};
+		this.getData = function(){
+			return this.data;
+		}
+		this.setData = function(obj){
+			this.data = obj;
+		}
+	}
+	 
+	var View = function(){
+		var _model;
+		this.click = function(){
+			var _controller = new Controller();
+			_model = _controller.render('MVC');
+			var content = _model.getData().content;
+
+			document.querySelector('#content').innerHTML = content;
+			console.log('<p>' + content + ' </p>');
+		}
+	}
+	 
+	var Controller = function(){
+		this.render = function(content){
+			var model = new Model();
+			//... my logis
+			model.setData({content: content});
+			return model;
+		}
+	}
+	 
+	var _view = new View();
+	_view.click();
+	
+</script>

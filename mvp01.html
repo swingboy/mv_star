@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>mvp</title>
+	<script type="text/javascript" src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.js"></script>
+	<style>
+		.out{
+			display: flex;
+			flex-direction: row;
+		}
+		#increase, #decrease, #num{
+			width: 50px;
+			height: 50px;
+			border:1px solid red;
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+		}
+	</style>
+</head>
+<body>
+	<div class="out">
+		<div id="increase">+</div>
+		<div id="decrease">-</div>
+		<div id="num">-</div>
+	</div>
+</body>
+</html>
+
+<script>
+var myapp = {};	
+myapp.Model = function() {
+    var val = 0;
+
+    this.add = function(v) {
+        if (val < 100) val += v;
+    };
+
+    this.sub = function(v) {
+        if (val > 0) val -= v;
+    };
+
+    this.getVal = function() {
+        return val;
+    };
+};
+
+myapp.View = function() {
+    var $num = $('#num'),
+        $incBtn = $('#increase'),
+        $decBtn = $('#decrease');
+
+    this.render = function(model) {
+        $num.text(model.getVal());
+    };
+
+    this.init = function() {
+        var presenter = new myapp.Presenter(this);
+        $incBtn.click(presenter.increase);
+        $decBtn.click(presenter.decrease);
+    };
+};
+
+myapp.Presenter = function(view) {
+    var _model = new myapp.Model();
+    var _view = view;
+
+    _view.render(_model);
+
+    this.increase = function() {
+        _model.add(1);
+        _view.render(_model);
+    };
+
+    this.decrease = function() {
+        _model.sub(1);
+        _view.render(_model);
+    };
+};
+
+new myapp.View().init();
+</script>

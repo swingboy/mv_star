@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	内容：<p id="content">MVVM</p>
+</body>
+</html>
+
+<script type="text/javascript">
+	var Myapp = {};
+
+	Myapp.Model = function(viewModel){
+		this.viewModel = viewModel;
+		this.viewModel.bindModel(this);
+		this.data = {};
+		this.getData = function(){
+			return this.data;
+		}
+		this.setData = function(data){
+			this.data = data;
+			this.viewModel.onModelChange(this);
+		}
+	}
+	 
+	Myapp.View = function(viewModel){
+		this.viewModel = viewModel;
+		this.viewModel.bindView(this);
+		this._desc = 'MVVM';
+		this.show = function(_desc){
+			_desc && (this._desc = _desc);
+			console.log('<p>' + this._desc + '</p>');
+			document.querySelector('#content').innerHTML = this._desc;
+		}
+	 
+		this.editDesc = function(desc){
+			// this._desc = 'MVVM';
+			this._desc = desc;
+			this.viewModel.onPageChange(this);
+		}
+	}
+	 
+	Myapp.ViewModel = function(){
+		var _model;
+		var _view;
+		var _this = this;
+
+		_this.bindModel = function(model){
+			_model = model;
+		}
+		_this.bindView = function(view){
+			_view = view;
+		}
+		_this.onPageChange = function(view){
+			_model.setData({desc: view.desc});
+		}
+		_this.onModelChange = function(model){
+			_view.show(model.getData().desc);
+		}
+	}
+	 
+	var viewModel = new Myapp.ViewModel();
+	var model = new Myapp.Model(viewModel);
+	var view = new Myapp.View(viewModel);
+
+	view.show();
+	// <p>MVVM</p>
+
+	view.editDesc('test');
+	// <p>TEST</p>
+
+	model.setData({desc:'hello MVVM'});
+	// <p>hello MVVM</p>
+
+</script>

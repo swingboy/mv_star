@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>mvvm</title>
+	<script type="text/javascript" src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.js"></script>
+	<style>
+		.out{
+			display: flex;
+			flex-direction: row;
+		}
+		#increase, #decrease, #num{
+			width: 50px;
+			height: 50px;
+			border:1px solid red;
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+		}
+	</style>
+</head>
+<body>
+	<div class="out">
+		<div id="increase">+</div>
+		<div id="decrease">-</div>
+		<div id="num">-</div>
+	</div>
+
+	<div id="myapp">
+		<div>
+			<span>{{ val }}rmb</span>
+		</div>
+		<div>
+			<button v-on:click="sub(1)">-</button>
+			<button v-on:click="add(1)">+</button>
+		</div>
+	</div>
+</body>
+</html>
+
+<script>
+var data = {
+    val: 0
+};
+
+new Vue({
+    el: '#myapp',
+    data: data,
+    methods: {
+        add(v) {
+            if(this.val < 100) {
+                this.val += v;
+            }
+        },
+        sub(v) {
+            if(this.val > 0) {
+                this.val -= v;
+            }
+        }
+    }
+});
+
+
+var foo = {
+  name: 'vue',
+  version: '2.0'
+}
+
+function observe(data) {
+    if (!data || typeof data !== 'object') {
+        return
+    }
+    // 使用递归劫持对象属性
+    Object.keys(data).forEach(function(key) {
+        defineReactive(data, key, data[key]);
+    })
+}
+
+function defineReactive(obj, key, value) {
+     // 监听子属性 比如这里data对象里的 'name' 或者 'version'
+     observe(value)
+
+    Object.defineProperty(obj, key, {
+        get: function reactiveGetter() {
+            return value
+        },
+        set: function reactiveSetter(newVal) {
+            if (value === newVal) {
+                return
+            } else {
+                value = newVal
+                console.log(`监听成功：${value} --> ${newVal}`)
+            }
+        }
+    })
+}
+
+observe(foo)
+foo.name = 'angular' // “监听成功：vue --> angular”
+
+</script>

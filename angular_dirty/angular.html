@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div>
+        <form>
+            <input type="text" ng-bind="count" />
+            <button type="button" ng-click="increment" >increment</button>
+        </form>
+        <div ng-bind="count">
+        </div>
+    </div>
+</body>
+</html>
+<script>
+    function Scope() {
+        this.$$watchers = [];
+    }
+
+    Scope.prototype.$watch = function (name, exp, listener) {
+        this.$$watchers.push({
+            name: name,
+            last: '',
+            newVal: exp,
+            listener: listener || function () { }
+        })
+    }
+
+    Scope.prototype.$digest = function () {
+        var bindList = document.querySelectorAll("[ng-bind]");      //获取所有含ng-bind的DOM节点
+        var dirty = true;
+        while (dirty) {
+            dirty = false;
+            for (var i = 0; i < this.$$watchers.length; i++) {
+                var newVal = this.$$watchers[i].newVal();
+                var oldVal = this.$$watchers[i].last;
+
+                if (newVal !== oldVal && !isNaN(newVal) && !isNaN(oldVal)) {
+                    dirty = true;
+                    this.$$watchers[i].listener(oldVal, newVal);
+                    this.$$watchers[i].last = newVal;
+
+                    for (var j = 0; j < bindList.length; j++) {
+                        //获取DOM上的数据变量的名称
+                        var modelName = bindList[j].getAttribute("ng-bind");
+                        if (modelName == this.$$watchers[i].name) {
+                            if (bindList[j].tagName == "INPUT") {
+                                //更新input的输入值
+                                bindList[j].value = this[modelName];
+                            }
+                            else {
+                                
+                                bindList[j].innerHTML = this[modelName];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    window.onload = function () {
+        var $scope = new Scope();
+        $scope.count = 0;
+        $scope.increment = function () {
+            this.count++;
+        };
+
+        //解析ng指令
+        var bindList = document.querySelectorAll("[ng-click]");
+        for (var i = 0; i < bindList.length; i++) {
+            bindList[i].onclick = (function (index) {
+                return function () {
+                    $scope[bindList[index].getAttribute("ng-click")]();
+                    $scope.$digest();
+                }
+            })(i)
+        }
+
+        var inputList = document.querySelectorAll("input[ng-bind]");
+        for (var i = 0; i < inputList.length; i++) {
+            inputList[i].addEventListener("input", (function (index) {
+                return function () {
+                    $scope[inputList[index].getAttribute("ng-bind")] = inputList[index].value;
+                    $scope.$digest();
+                }
+            })(i));
+        }
+
+        //绑定数据
+        for (var key in $scope) {
+            if (key != "$$watchers" && typeof $scope[key] != "function") {
+                $scope.$watch(key, (function (index) {
+                    return function () {
+                        return $scope[index];
+                    }
+                })(key))
+            }
+        }
+
+        $scope.$digest();
+    };
+    
+    
+</script>

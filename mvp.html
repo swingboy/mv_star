@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+</body>
+</html>
+<script>
+
+var Model = function(){
+    this.data ={};
+    this.getData = function(){
+        return this.data;
+    }
+    this.setData = function(obj){
+        this.data = obj;
+    }
+}
+ 
+var View = function(){
+    this.show = function(desc){
+        console.log('<p>' + desc + '</p>');
+    }
+    this.click = function(){
+        var _controller = new Presenter(this);
+        _controller.render('MVP');
+    }
+}
+ 
+var Presenter = function(view){
+    var _model = new Model();
+    var _view = view;
+    this.render = function(desc){
+        //...处理业务
+        _model.setData({type:'hello MVP'})
+        var type = _model.getData().type;
+        _view.show(type);
+    }
+}
+ 
+var _view = new View();
+_view.click();
+ 
+// <p>hello MVP</p>
+</script>
